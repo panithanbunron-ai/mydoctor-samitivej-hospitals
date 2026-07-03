@@ -1,3 +1,7 @@
+# Environment variables (keep .env.example committed)
+.env
+.env.local
+
 # Playwright
 node_modules/
 /test-results/

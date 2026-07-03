@@ -1,25 +1,32 @@
 {
-  "name": "mydoctor-samitivej-hospitals",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/panithanbunron-ai/mydoctor-samitivej-hospitals.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/panithanbunron-ai/mydoctor-samitivej-hospitals/issues"
-  },
-  "homepage": "https://github.com/panithanbunron-ai/mydoctor-samitivej-hospitals#readme",
-  "devDependencies": {
-    "@playwright/test": "^1.61.1",
-    "@types/node": "^26.1.0",
-    "eslint": "^10.6.0",
-    "eslint-config-prettier": "^10.1.8",
-    "prettier": "^3.9.4"
-  }
+    "name": "mydoctor-samitivej-hospitals",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "playwright test",
+        "test:ui": "playwright test --ui",
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "lint": "eslint ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/panithanbunron-ai/mydoctor-samitivej-hospitals.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/panithanbunron-ai/mydoctor-samitivej-hospitals/issues"
+    },
+    "homepage": "https://github.com/panithanbunron-ai/mydoctor-samitivej-hospitals#readme",
+    "devDependencies": {
+        "@playwright/test": "^1.61.1",
+        "@types/node": "^26.1.0",
+        "dotenv": "^17.4.2",
+        "eslint": "^10.6.0",
+        "eslint-config-prettier": "^10.1.8",
+        "prettier": "^3.9.4"
+    }
 }
