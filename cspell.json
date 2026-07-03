@@ -1,0 +1,16 @@
+{
+    "version": "0.2",
+    "language": "en",
+    "ignoreRegExpList": ["/[\\u0E00-\\u0E7F]+/g"],
+    "words": [
+        "Telemedicine",
+        "mydoctor",
+        "Samitivej",
+        "samitivejhospitals",
+        "backoffice",
+        "dotenv",
+        "playwright",
+        "pageerror",
+        "swal"
+    ]
+}
