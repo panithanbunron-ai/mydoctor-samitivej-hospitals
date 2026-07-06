@@ -1,43 +1,28 @@
-import { test, expect, type Page } from '@playwright/test';
-import { AgreementPage, type LangCode } from '../../src/pages/telemedicine/AgreementPage';
+import { test, expect } from '../../src/fixtures/telemedicine';
+import { type AgreementPage, type LangCode } from '../../src/pages/telemedicine/AgreementPage';
 import { agreementTexts } from '../../src/test-data/agreement';
 import { check } from '../../src/utils/visual-check';
 
-// Open the app once and share it across the cases in this file. 'default' (not
-// 'serial') keeps them in one worker sharing the page, but lets every case run
-// even when an earlier one fails — serial would skip the rest on first failure.
+// The `agreement` fixture opens the app once per worker and shares it across the
+// cases. 'default' (not 'serial') keeps them in one worker sharing that page but
+// lets every case run even when an earlier one fails — serial would skip the rest.
 test.describe.configure({ mode: 'default' });
 
 test.describe('Telemedicine - Agreement', () => {
-    let page: Page;
-    let agreement: AgreementPage;
-    const pageErrors: string[] = [];
-
-    test.beforeAll(async ({ browser }) => {
-        page = await browser.newPage();
-        page.on('pageerror', (err) => {
-            // WebKit surfaces UAT backend CORS/network failures (e.g. the
-            // GetAgreement fetch "due to access control checks") as pageerror
-            // events; Chromium does not. These are environmental noise, not app
-            // JS errors, so keep only genuine runtime errors.
-            if (/access control checks|Load failed|Failed to fetch/i.test(err.message)) return;
-            pageErrors.push(err.message);
-        });
-        agreement = new AgreementPage(page);
-        await agreement.goto();
-    });
-
-    test.afterAll(async () => {
-        await page.close();
-    });
-
-    async function checkTexts(lang: LangCode, note: string): Promise<void> {
+    async function checkTexts(
+        agreement: AgreementPage,
+        lang: LangCode,
+        note: string,
+    ): Promise<void> {
         for (const { label, locator } of agreement.textElements(lang)) {
             await check(locator, `${label} — ${note}`, (l) => expect(l).toBeVisible());
         }
     }
 
-    test('Verify the Language Toggle switches all Agreement page text between EN and TH', async () => {
+    test('Verify the Language Toggle switches all Agreement page text between EN and TH', async ({
+        agreement,
+        pageErrors,
+    }) => {
         await check(agreement.languageToggle, 'language toggle visible', (l) =>
             expect(l).toBeVisible(),
         );
@@ -46,10 +31,10 @@ test.describe('Telemedicine - Agreement', () => {
         expect(current === 'TH' || current === 'EN').toBeTruthy();
         const other: LangCode = current === 'TH' ? 'EN' : 'TH';
 
-        await checkTexts(current, 'baseline');
+        await checkTexts(agreement, current, 'baseline');
 
         await agreement.switchLanguage(other);
-        await checkTexts(other, `after switch to ${other}`);
+        await checkTexts(agreement, other, `after switch to ${other}`);
         await check(
             agreement.headingLocator(current),
             `${current} heading hidden after switch`,
@@ -67,7 +52,9 @@ test.describe('Telemedicine - Agreement', () => {
         expect(pageErrors, `page errors: ${pageErrors.join('; ')}`).toEqual([]);
     });
 
-    test('Verify checkbox 1 cannot be checked and an alert is shown if the agreement text has not been scrolled to the bottom', async () => {
+    test('Verify checkbox 1 cannot be checked and an alert is shown if the agreement text has not been scrolled to the bottom', async ({
+        agreement,
+    }) => {
         const lang = await agreement.currentLanguage();
 
         await check(agreement.serviceConsentCheckbox, 'checkbox 1 unchecked (before)', (l) =>
@@ -94,7 +81,9 @@ test.describe('Telemedicine - Agreement', () => {
         );
     });
 
-    test('Verify checkbox 2 can be checked at any time without any scroll condition', async () => {
+    test('Verify checkbox 2 can be checked at any time without any scroll condition', async ({
+        agreement,
+    }) => {
         // Re-open the page for a pristine, top-of-page state (no scroll, no lingering alert).
         await agreement.goto();
 
@@ -121,7 +110,9 @@ test.describe('Telemedicine - Agreement', () => {
         );
     });
 
-    test('Verify the Confirm button stays disabled until checkbox 1 is checked, then becomes enabled', async () => {
+    test('Verify the Confirm button stays disabled until checkbox 1 is checked, then becomes enabled', async ({
+        agreement,
+    }) => {
         await agreement.goto();
         const lang = await agreement.currentLanguage();
         await agreement.scrollTermsToBottom();
@@ -155,7 +146,10 @@ test.describe('Telemedicine - Agreement', () => {
         );
     });
 
-    test('Verify clicking the Cancel button keeps the user on the Agreement page', async () => {
+    test('Verify clicking the Cancel button keeps the user on the Agreement page', async ({
+        agreement,
+        pageErrors,
+    }) => {
         await agreement.goto();
         const lang = await agreement.currentLanguage();
 
@@ -166,7 +160,7 @@ test.describe('Telemedicine - Agreement', () => {
         await agreement.cancelButton(lang).click();
 
         // User stays on the Agreement page: path unchanged and heading still shown.
-        expect(new URL(page.url()).pathname).toBe('/');
+        expect(new URL(agreement.page.url()).pathname).toBe('/');
         await check(agreement.headingLocator(lang), 'Agreement heading still visible', (l) =>
             expect(l).toBeVisible(),
         );
