@@ -1,4 +1,4 @@
-export const AGREEMENT_COPY = {
+export const agreementTexts = {
     TH: {
         // Heading renders as two <strong> lines split by <br>, so match each part.
         headingParts: ['ข้อกำหนดและเงื่อนไขของการรับบริการ', 'และการให้ความยินยอม'],
@@ -16,4 +16,4 @@ export const AGREEMENT_COPY = {
     },
 } as const;
 
-export type LangCode = keyof typeof AGREEMENT_COPY;
+export type LangCode = keyof typeof agreementTexts;

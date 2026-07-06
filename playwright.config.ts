@@ -50,8 +50,12 @@ export default defineConfig({
         {
             name: 'telemedicine',
             testDir: './tests/telemedicine',
+            /* Telemedicine is a mobile web app: run it at a mobile viewport. */
             use: {
-                ...devices['Desktop Chrome'],
+                ...devices['iPhone 14 Pro Max'],
+                // Capture report screenshots at 1x (device is 3x) to keep them a
+                // reasonable size; viewport and mobile behavior are unchanged.
+                deviceScaleFactor: 1,
                 baseURL: TELEMEDICINE_URL,
             },
         },

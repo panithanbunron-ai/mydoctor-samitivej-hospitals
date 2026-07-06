@@ -11,6 +11,9 @@
         "dotenv",
         "playwright",
         "pageerror",
-        "swal"
+        "swal",
+        "vcheck",
+        "domcontentloaded",
+        "openExternalBrowser"
     ]
 }

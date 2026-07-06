@@ -1,5 +1,5 @@
 import { type Page, type Locator, expect } from '@playwright/test';
-import { AGREEMENT_COPY, type LangCode } from '../../test-data/agreement';
+import { agreementTexts, type LangCode } from '../../test-data/agreement';
 
 export type { LangCode };
 
@@ -7,6 +7,7 @@ export class AgreementPage {
     readonly page: Page;
     readonly languageToggle: Locator;
     readonly serviceConsentCheckbox: Locator;
+    readonly marketingConsentCheckbox: Locator;
     readonly readAgreementAlert: Locator;
 
     constructor(page: Page) {
@@ -16,11 +17,42 @@ export class AgreementPage {
             .filter({ hasText: /^(TH|EN)$/ })
             .first();
         this.serviceConsentCheckbox = page.locator('input[type="checkbox"]').first();
+        this.marketingConsentCheckbox = page.locator('input[type="checkbox"]').nth(1);
         this.readAgreementAlert = page.locator('.swal2-popup');
     }
 
     async goto(): Promise<void> {
-        await this.page.goto('/');
+        // The app immediately redirects "/" → "/?openExternalBrowser=1", which
+        // interrupts the initial navigation and throws under WebKit. Wait only for
+        // the commit, then settle on the post-redirect load.
+        await this.page.goto('/', { waitUntil: 'commit' });
+        await this.page.waitForLoadState('domcontentloaded');
+    }
+
+    /** Scroll the terms to the bottom — the app's precondition for enabling checkbox 1. */
+    async scrollTermsToBottom(): Promise<void> {
+        await this.serviceConsentCheckbox.waitFor({ state: 'visible' });
+        // The terms scroll region mounts after the checkboxes; poll for it (tallest
+        // scrollable element, no brittle selector), then scroll it to the bottom.
+        await this.page.waitForFunction(() => {
+            let target: HTMLElement | null = null;
+            let maxDelta = 0;
+            document.querySelectorAll<HTMLElement>('*').forEach((el) => {
+                const overflowY = getComputedStyle(el).overflowY;
+                const scrollable = overflowY === 'auto' || overflowY === 'scroll';
+                const delta = el.scrollHeight - el.clientHeight;
+                if (scrollable && el.clientHeight > 100 && delta > maxDelta) {
+                    maxDelta = delta;
+                    target = el;
+                }
+            });
+            if (!target) return false;
+            const el = target as HTMLElement;
+            el.scrollTop = el.scrollHeight;
+            el.dispatchEvent(new Event('scroll', { bubbles: true }));
+            return true;
+        });
+        await this.page.waitForTimeout(300);
     }
 
     async currentLanguage(): Promise<LangCode> {
@@ -43,23 +75,41 @@ export class AgreementPage {
     }
 
     confirmButton(lang: LangCode): Locator {
-        return this.visibleButton(AGREEMENT_COPY[lang].confirm);
+        return this.visibleButton(agreementTexts[lang].confirm);
     }
 
-    async expectCopy(lang: LangCode): Promise<void> {
-        const copy = AGREEMENT_COPY[lang];
-        for (const part of copy.headingParts) {
-            await expect(this.page.getByText(part).first()).toBeVisible();
-        }
-        await expect(this.page.getByText(copy.serviceConsent).first()).toBeVisible();
-        await expect(this.page.getByText(copy.marketingConsent).first()).toBeVisible();
-        await expect(this.visibleButton(copy.cancel)).toBeVisible();
-        await expect(this.visibleButton(copy.confirm)).toBeVisible();
+    cancelButton(lang: LangCode): Locator {
+        return this.visibleButton(agreementTexts[lang].cancel);
     }
 
-    async expectHeadingHidden(lang: LangCode): Promise<void> {
-        await expect(
-            this.page.getByText(AGREEMENT_COPY[lang].headingParts[0]).first(),
-        ).toBeHidden();
+    headingLocator(lang: LangCode): Locator {
+        return this.page.getByText(agreementTexts[lang].headingParts[0]).first();
+    }
+
+    /** Each tracked piece of text for `lang`, with a label for reporting. */
+    textElements(lang: LangCode): { label: string; locator: Locator }[] {
+        const texts = agreementTexts[lang];
+        return [
+            ...texts.headingParts.map((text, i) => ({
+                label: `${lang} heading part ${i + 1}`,
+                locator: this.page.getByText(text).first(),
+            })),
+            {
+                label: `${lang} service-consent label`,
+                locator: this.page.getByText(texts.serviceConsent).first(),
+            },
+            {
+                label: `${lang} marketing-consent label`,
+                locator: this.page.getByText(texts.marketingConsent).first(),
+            },
+            {
+                label: `${lang} Cancel button`,
+                locator: this.visibleButton(texts.cancel),
+            },
+            {
+                label: `${lang} Confirm button`,
+                locator: this.confirmButton(lang),
+            },
+        ];
     }
 }
