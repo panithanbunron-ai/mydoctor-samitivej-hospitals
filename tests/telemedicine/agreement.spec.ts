@@ -1,11 +1,10 @@
 import { test, expect } from '../../src/fixtures/telemedicine';
 import { type AgreementPage, type LangCode } from '../../src/pages/telemedicine/AgreementPage';
-import { agreementTexts } from '../../src/test-data/agreement';
+import { RegisterPage } from '../../src/pages/telemedicine/RegisterPage';
+import { agreementTexts, consentPopups } from '../../src/test-data/agreement';
 import { check } from '../../src/utils/visual-check';
 
-// The `agreement` fixture opens the app once per worker and shares it across the
-// cases. 'default' (not 'serial') keeps them in one worker sharing that page but
-// lets every case run even when an earlier one fails — serial would skip the rest.
+// 'default' (not 'serial'): cases share the worker's page but each still runs if an earlier one fails.
 test.describe.configure({ mode: 'default' });
 
 test.describe('Telemedicine - Agreement', () => {
@@ -19,7 +18,7 @@ test.describe('Telemedicine - Agreement', () => {
         }
     }
 
-    test('Verify the Language Toggle switches all Agreement page text between EN and TH', async ({
+    test('TC_MDR_AGR_001 : Verify the Language Toggle switches all Agreement page text between EN and TH', async ({
         agreement,
         pageErrors,
     }) => {
@@ -52,7 +51,7 @@ test.describe('Telemedicine - Agreement', () => {
         expect(pageErrors, `page errors: ${pageErrors.join('; ')}`).toEqual([]);
     });
 
-    test('Verify checkbox 1 cannot be checked and an alert is shown if the agreement text has not been scrolled to the bottom', async ({
+    test('TC_MDR_AGR_002 : Verify checkbox 1 cannot be checked and an alert is shown if the agreement text has not been scrolled to the bottom', async ({
         agreement,
     }) => {
         const lang = await agreement.currentLanguage();
@@ -81,7 +80,7 @@ test.describe('Telemedicine - Agreement', () => {
         );
     });
 
-    test('Verify checkbox 2 can be checked at any time without any scroll condition', async ({
+    test('TC_MDR_AGR_003 : Verify checkbox 2 can be checked at any time without any scroll condition', async ({
         agreement,
     }) => {
         // Re-open the page for a pristine, top-of-page state (no scroll, no lingering alert).
@@ -110,7 +109,7 @@ test.describe('Telemedicine - Agreement', () => {
         );
     });
 
-    test('Verify the Confirm button stays disabled until checkbox 1 is checked, then becomes enabled', async ({
+    test('TC_MDR_AGR_004 : Verify the Confirm button stays disabled until checkbox 1 is checked, then becomes enabled', async ({
         agreement,
     }) => {
         await agreement.goto();
@@ -146,7 +145,7 @@ test.describe('Telemedicine - Agreement', () => {
         );
     });
 
-    test('Verify clicking the Cancel button keeps the user on the Agreement page', async ({
+    test('TC_MDR_AGR_005 : Verify clicking the Cancel button keeps the user on the Agreement page', async ({
         agreement,
         pageErrors,
     }) => {
@@ -162,6 +161,103 @@ test.describe('Telemedicine - Agreement', () => {
         // User stays on the Agreement page: path unchanged and heading still shown.
         expect(new URL(agreement.page.url()).pathname).toBe('/');
         await check(agreement.headingLocator(lang), 'Agreement heading still visible', (l) =>
+            expect(l).toBeVisible(),
+        );
+
+        expect(pageErrors, `page errors: ${pageErrors.join('; ')}`).toEqual([]);
+    });
+
+    test("TC_MDR_AGR_006 : Verify tapping each checkbox's label text opens a popup with the correct consent content", async ({
+        agreement,
+        pageErrors,
+    }) => {
+        await agreement.goto();
+        const lang = await agreement.currentLanguage();
+        const popups = consentPopups[lang];
+
+        // 1. Tap checkbox 1's label → personal-data-disclosure consent popup.
+        await agreement.openConsentPopup(lang, 'service');
+        await check(agreement.consentPopup, "checkbox 1's label opens a popup", (l) =>
+            expect(l).toBeVisible(),
+        );
+        for (const phrase of popups.service.contains) {
+            await check(agreement.consentPopup, `service popup shows: "${phrase}"`, (l) =>
+                expect(l).toContainText(phrase),
+            );
+        }
+        // The two popups must not be swapped: no marketing-only wording here.
+        await check(agreement.consentPopup, 'service popup is not the marketing consent', (l) =>
+            expect(l).not.toContainText(popups.marketing.unique),
+        );
+        await check(agreement.consentPopupOkButton, 'popup OK button reads "OK"', (l) =>
+            expect(l).toHaveText(consentPopups.ok),
+        );
+
+        // 2. Close the popup.
+        await agreement.closeConsentPopup();
+        await check(agreement.consentPopup, 'popup dismissed after tapping OK', (l) =>
+            expect(l).toBeHidden(),
+        );
+
+        // 3. Tap checkbox 2's label → marketing-consent popup.
+        await agreement.openConsentPopup(lang, 'marketing');
+        await check(agreement.consentPopup, "checkbox 2's label opens a popup", (l) =>
+            expect(l).toBeVisible(),
+        );
+        for (const phrase of popups.marketing.contains) {
+            await check(agreement.consentPopup, `marketing popup shows: "${phrase}"`, (l) =>
+                expect(l).toContainText(phrase),
+            );
+        }
+        await check(agreement.consentPopup, 'marketing popup is not the service consent', (l) =>
+            expect(l).not.toContainText(popups.service.unique),
+        );
+        await check(agreement.consentPopupOkButton, 'popup OK button reads "OK"', (l) =>
+            expect(l).toHaveText(consentPopups.ok),
+        );
+        await agreement.closeConsentPopup();
+
+        expect(pageErrors, `page errors: ${pageErrors.join('; ')}`).toEqual([]);
+    });
+
+    test('TC_MDR_AGR_007 : Verify clicking Confirm after checking checkbox 1 navigates to the Register page', async ({
+        agreement,
+        pageErrors,
+    }) => {
+        await agreement.goto();
+        const lang = await agreement.currentLanguage();
+
+        // 1. Scroll the terms to the bottom (the app's precondition for checkbox 1).
+        await agreement.scrollTermsToBottom();
+
+        // 2. Check checkbox 1, which enables Confirm.
+        await agreement.serviceConsentCheckbox.click({ force: true });
+        await check(agreement.serviceConsentCheckbox, 'checkbox 1 checked', (l) =>
+            expect(l).toBeChecked(),
+        );
+        await check(agreement.confirmButton(lang), 'Confirm enabled', (l) =>
+            expect(l).toBeEnabled(),
+        );
+
+        // 3. Tap Confirm and wait for the Register navigation.
+        await Promise.all([
+            agreement.page.waitForURL(`**${RegisterPage.path}`),
+            agreement.confirmButton(lang).click(),
+        ]);
+
+        // Behavior: navigation lands on "/register".
+        expect(new URL(agreement.page.url()).pathname).toBe(RegisterPage.path);
+
+        // UI/Wording: the Register page shows the required-field labels and the
+        // phone field with its expected placeholder.
+        const register = new RegisterPage(agreement.page);
+        await check(register.firstNameLabel(lang), 'First Name required-field label shown', (l) =>
+            expect(l).toBeVisible(),
+        );
+        await check(register.lastNameLabel(lang), 'Last Name required-field label shown', (l) =>
+            expect(l).toBeVisible(),
+        );
+        await check(register.phoneField(lang), 'phone field with expected placeholder shown', (l) =>
             expect(l).toBeVisible(),
         );
 

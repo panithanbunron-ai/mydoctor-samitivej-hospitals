@@ -1,7 +1,8 @@
 import { type Page, type Locator, expect } from '@playwright/test';
-import { agreementTexts, type LangCode } from '../../test-data/agreement';
+import { agreementTexts, type LangCode, type ConsentKind } from '../../test-data/agreement';
+import { RegisterPage } from './RegisterPage';
 
-export type { LangCode };
+export type { LangCode, ConsentKind };
 
 export class AgreementPage {
     readonly page: Page;
@@ -9,6 +10,9 @@ export class AgreementPage {
     readonly serviceConsentCheckbox: Locator;
     readonly marketingConsentCheckbox: Locator;
     readonly readAgreementAlert: Locator;
+    /** The consent-detail popup opened by tapping a checkbox's label text. */
+    readonly consentPopup: Locator;
+    readonly consentPopupOkButton: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -19,21 +23,60 @@ export class AgreementPage {
         this.serviceConsentCheckbox = page.locator('input[type="checkbox"]').first();
         this.marketingConsentCheckbox = page.locator('input[type="checkbox"]').nth(1);
         this.readAgreementAlert = page.locator('.swal2-popup');
+        // Extra class distinguishes it from the plain `.swal2-popup` read-agreement alert.
+        this.consentPopup = page.locator('.swal2-popup.consent-swal-popup');
+        this.consentPopupOkButton = this.consentPopup.locator('.swal2-confirm');
+    }
+
+    /** The tappable label text next to a consent checkbox. */
+    consentLabel(lang: LangCode, kind: ConsentKind): Locator {
+        const text =
+            kind === 'service'
+                ? agreementTexts[lang].serviceConsent
+                : agreementTexts[lang].marketingConsent;
+        return this.page.getByText(text).first();
+    }
+
+    /** Tap a checkbox's label text to open its consent-detail popup. */
+    async openConsentPopup(lang: LangCode, kind: ConsentKind): Promise<void> {
+        await this.consentLabel(lang, kind).click();
+        await this.consentPopup.waitFor({ state: 'visible' });
+    }
+
+    /** Dismiss the consent popup via its OK button. */
+    async closeConsentPopup(): Promise<void> {
+        await this.consentPopupOkButton.click();
+        await this.consentPopup.waitFor({ state: 'hidden' });
     }
 
     async goto(): Promise<void> {
-        // The app immediately redirects "/" → "/?openExternalBrowser=1", which
-        // interrupts the initial navigation and throws under WebKit. Wait only for
-        // the commit, then settle on the post-redirect load.
-        await this.page.goto('/', { waitUntil: 'commit' });
+        // "/" redirects to "/?openExternalBrowser=1", aborting the initial nav under WebKit; wait for commit, swallow that abort, then settle.
+        try {
+            await this.page.goto('/', { waitUntil: 'commit' });
+        } catch (err) {
+            if (!/interrupted by another navigation/i.test(String(err))) throw err;
+        }
         await this.page.waitForLoadState('domcontentloaded');
+    }
+
+    /** From a pristine Agreement page, accept the service consent and Confirm through to Register. */
+    async proceedToRegister(): Promise<RegisterPage> {
+        await this.goto();
+        const lang = await this.currentLanguage();
+        await this.scrollTermsToBottom();
+        await this.serviceConsentCheckbox.click({ force: true });
+        await expect(this.confirmButton(lang)).toBeEnabled();
+        await Promise.all([
+            this.page.waitForURL(`**${RegisterPage.path}`),
+            this.confirmButton(lang).click(),
+        ]);
+        return new RegisterPage(this.page);
     }
 
     /** Scroll the terms to the bottom — the app's precondition for enabling checkbox 1. */
     async scrollTermsToBottom(): Promise<void> {
         await this.serviceConsentCheckbox.waitFor({ state: 'visible' });
-        // The terms scroll region mounts after the checkboxes; poll for it (tallest
-        // scrollable element, no brittle selector), then scroll it to the bottom.
+        // Scroll region mounts after the checkboxes; find it heuristically (tallest scrollable element) and scroll to bottom.
         await this.page.waitForFunction(() => {
             let target: HTMLElement | null = null;
             let maxDelta = 0;

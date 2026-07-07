@@ -1,10 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-/**
- * Tests for my-doctor-backoffice.
- * baseURL is set per-project in playwright.config.ts (BACKOFFICE_URL),
- * so page.goto('/') targets the backoffice app.
- */
+// Backoffice project sets baseURL to BACKOFFICE_URL, so page.goto('/') targets the backoffice app.
 test('backoffice home page loads', async ({ page }) => {
     await page.goto('/');
 

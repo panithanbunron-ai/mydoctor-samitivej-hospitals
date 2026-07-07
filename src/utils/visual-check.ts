@@ -2,14 +2,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 
 type Assertion = (locator: Locator) => Promise<void>;
 
-/**
- * Run an assertion against `locator`, draw a Pass/Fail box around it, capture a
- * screenshot into the HTML report, and record a soft failure so the run keeps
- * annotating the remaining checkpoints.
- *
- * Green box = Pass, red box = Fail. The report attachment is named
- * "PASS — <label>" / "FAIL — <label>".
- */
+/** Run `assertion` as a soft check: draw a Pass/Fail box, attach an annotated screenshot, and keep going on failure. */
 export async function check(
     locator: Locator,
     label: string,
@@ -31,15 +24,15 @@ export async function check(
         await locator.first().scrollIntoViewIfNeeded({ timeout: 1000 });
         box = await locator.first().boundingBox();
     } catch {
-        // Element not present/visible (e.g. an intentionally-hidden check) —
-        // fall back to a banner-only annotation.
+        // Not present/visible (e.g. an intentionally-hidden check) — banner-only annotation.
     }
 
-    // Keep the error concise: strip the ANSI color codes Playwright embeds
-    // (they render as garbage boxes on the banner), then take the first line so
-    // it fits the on-screen banner and the attachment title.
+    // Strip Playwright's ANSI color codes and keep the first line for the banner/title.
     // eslint-disable-next-line no-control-regex
-    const reason = message.replace(/\u001b\[[0-9;]*m/g, '').split('\n')[0].trim();
+    const reason = message
+        .replace(/\u001b\[[0-9;]*m/g, '')
+        .split('\n')[0]
+        .trim();
 
     const screenshot = await annotate(page, box, label, passed, reason);
     const title = passed ? `PASS — ${label}` : `FAIL — ${label}${reason ? ` — ${reason}` : ''}`;
@@ -101,8 +94,7 @@ async function annotate(
         { box, label, passed, reason },
     );
 
-    // Viewport (not full-page) screenshot so the fixed-position overlay aligns
-    // with the boundingBox coordinates.
+    // Viewport screenshot so the fixed overlay aligns with the boundingBox coordinates.
     const buffer = await page.screenshot();
     await page.evaluate(() => document.getElementById('__vcheck__')?.remove());
     return buffer;

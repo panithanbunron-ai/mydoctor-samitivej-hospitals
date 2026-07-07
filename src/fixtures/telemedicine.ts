@@ -1,9 +1,7 @@
 import { test as base } from '@playwright/test';
 import { AgreementPage } from '../pages/telemedicine/AgreementPage';
 
-// WebKit surfaces UAT backend CORS/network failures (e.g. the GetAgreement fetch
-// "due to access control checks") as pageerror events; Chromium does not. These
-// are environmental noise, not app JS errors.
+// WebKit reports UAT CORS/network failures as pageerror events; filter them as environmental noise.
 const NETWORK_NOISE = /access control checks|Load failed|Failed to fetch/i;
 
 type TelemedicineFixtures = {
@@ -13,11 +11,7 @@ type TelemedicineFixtures = {
     pageErrors: string[];
 };
 
-/**
- * Worker-scoped fixtures: open the Agreement page a single time per worker and
- * share it across the cases in a file — fast, but cases are not isolated (use a
- * fresh `agreement.goto()` in a case that needs a pristine state).
- */
+// Worker-scoped fixtures: open the Agreement page once per worker, shared across a file's cases (not isolated — call agreement.goto() for a fresh state).
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export const test = base.extend<{}, TelemedicineFixtures>({
     pageErrors: [

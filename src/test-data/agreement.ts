@@ -17,3 +17,30 @@ export const agreementTexts = {
 } as const;
 
 export type LangCode = keyof typeof agreementTexts;
+
+/** Expected consent-popup content: `contains` = phrases that must all appear; `unique` = a phrase unique to this consent (proves the popups aren't swapped). */
+export const consentPopups = {
+    ok: 'OK',
+    TH: {
+        service: {
+            contains: ['เปิดเผยข้อมูลส่วนบุคคลของข้าพเจ้า', 'บริษัท กรุงเทพดรักสโตร์'],
+            unique: 'บริษัท กรุงเทพดรักสโตร์',
+        },
+        marketing: {
+            contains: ['จัดกิจกรรมทางการตลาด', 'Mydoctor@allianz.co.th'],
+            unique: 'ส่งเสริมการขาย',
+        },
+    },
+    EN: {
+        service: {
+            contains: ['disclose my personal information', 'Bangkok Drug Store'],
+            unique: 'Bangkok Drug Store',
+        },
+        marketing: {
+            contains: ['marketing activities', 'Mydoctor@allianz.co.th'],
+            unique: 'promote sales',
+        },
+    },
+} as const;
+
+export type ConsentKind = 'service' | 'marketing';
