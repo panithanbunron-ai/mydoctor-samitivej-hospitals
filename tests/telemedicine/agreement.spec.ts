@@ -1,7 +1,11 @@
 import { test, expect } from '../../src/fixtures/telemedicine';
 import { type AgreementPage, type LangCode } from '../../src/pages/telemedicine/AgreementPage';
 import { RegisterPage } from '../../src/pages/telemedicine/RegisterPage';
-import { agreementTexts, consentPopups } from '../../src/test-data/telemedicine/agreement';
+import {
+    agreementTexts,
+    consentPopups,
+    consentPopupOk,
+} from '../../src/test-data/telemedicine/agreement';
 import { check } from '../../src/utils/visual-check';
 
 // 'default' (not 'serial'): cases share the worker's page but each still runs if an earlier one fails.
@@ -190,7 +194,7 @@ test.describe('Telemedicine - Agreement', () => {
             expect(l).not.toContainText(popups.marketing.unique),
         );
         await check(agreement.consentPopupOkButton, 'popup OK button reads "OK"', (l) =>
-            expect(l).toHaveText(consentPopups.ok),
+            expect(l).toHaveText(consentPopupOk),
         );
 
         // 2. Close the popup.
@@ -213,7 +217,7 @@ test.describe('Telemedicine - Agreement', () => {
             expect(l).not.toContainText(popups.service.unique),
         );
         await check(agreement.consentPopupOkButton, 'popup OK button reads "OK"', (l) =>
-            expect(l).toHaveText(consentPopups.ok),
+            expect(l).toHaveText(consentPopupOk),
         );
         await agreement.closeConsentPopup();
 

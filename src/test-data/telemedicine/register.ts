@@ -1,18 +1,18 @@
+/** Register page: expected on-screen copy, then the inputs the tests feed in. */
 import { type LangCode } from './agreement';
 
-/** Register page copy. Name fields located by required-field labels ("... *"), phone field by its placeholder. */
-export const registerTexts: Record<
-    LangCode,
-    {
-        firstNameLabel: string;
-        lastNameLabel: string;
-        firstNamePlaceholder: string;
-        lastNamePlaceholder: string;
-        phonePlaceholder: string;
-        next: string;
-        requiredFieldsError: { title: string; body: string };
-    }
-> = {
+type RegisterCopy = {
+    firstNameLabel: string;
+    lastNameLabel: string;
+    firstNamePlaceholder: string;
+    lastNamePlaceholder: string;
+    phonePlaceholder: string;
+    next: string;
+    requiredFieldsError: { title: string; body: string };
+};
+
+/** Name fields are located by their required-field labels ("... *"), the phone field by its placeholder. */
+export const registerTexts: Record<LangCode, RegisterCopy> = {
     TH: {
         firstNameLabel: 'ชื่อ *',
         lastNameLabel: 'นามสกุล *',
@@ -47,7 +47,7 @@ export const validRegistration = {
     phone: '0812345678',
 };
 
-/** Per-case form inputs, keyed by test-case id — expected on-screen copy stays in registerTexts. */
+/** Per-case form inputs, keyed by test-case id — expected copy stays in registerTexts. */
 export const registerCases = {
     // First Name only; the rest cleared explicitly (the session restores earlier values).
     TC_MDR_REG_003: { firstName: validRegistration.firstName, lastName: '', phone: '' },
