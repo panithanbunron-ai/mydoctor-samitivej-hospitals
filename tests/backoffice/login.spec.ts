@@ -4,7 +4,7 @@ import { loginTexts, backofficeCredentials } from '../../src/test-data/backoffic
 import { check } from '../../src/utils/visual-check';
 
 test.describe('Backoffice - Login', () => {
-    test('TC_MDR_LOGIN_001 : Verify a valid username and password logs in and redirects to the OTP page', async ({
+    test('TC_MDR_LOGIN_001a : Verify the login page renders the logo, Username, Password and LOGIN button', async ({
         page,
     }) => {
         const login = new LoginPage(page);
@@ -21,16 +21,19 @@ test.describe('Backoffice - Login', () => {
         await check(login.loginButton, `LOGIN button reads "${loginTexts.loginButton}"`, (l) =>
             expect(l).toHaveText(loginTexts.loginButton),
         );
+    });
 
-        // The OTP redirect needs a real account; gate it on env credentials so CI stays green without secrets.
-        if (!backofficeCredentials.username || !backofficeCredentials.password) {
-            test.info().annotations.push({
-                type: 'skip',
-                description:
-                    'OTP-redirect step not exercised — set BACKOFFICE_USERNAME and BACKOFFICE_PASSWORD to run it.',
-            });
-            return;
-        }
+    test('TC_MDR_LOGIN_001b : Verify a valid username and password logs in and redirects to the OTP page', async ({
+        page,
+    }) => {
+        // Real account only — a proper skip so the report shows the missing coverage.
+        test.skip(
+            !backofficeCredentials.username || !backofficeCredentials.password,
+            'Set BACKOFFICE_USERNAME and BACKOFFICE_PASSWORD to run the OTP-redirect case.',
+        );
+
+        const login = new LoginPage(page);
+        await login.goto();
 
         // Enter valid credentials and submit.
         await login.fill({

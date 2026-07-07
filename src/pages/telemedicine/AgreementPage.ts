@@ -24,12 +24,22 @@ export class AgreementPage {
             .locator('button')
             .filter({ hasText: /^(TH|EN)$/ })
             .first();
-        this.serviceConsentCheckbox = page.locator('input[type="checkbox"]').first();
-        this.marketingConsentCheckbox = page.locator('input[type="checkbox"]').nth(1);
+        this.serviceConsentCheckbox = this.consentCheckbox('service');
+        this.marketingConsentCheckbox = this.consentCheckbox('marketing');
         this.readAgreementAlert = page.locator('.swal2-popup');
         // Extra class distinguishes it from the plain `.swal2-popup` read-agreement alert.
         this.consentPopup = page.locator('.swal2-popup.consent-swal-popup');
         this.consentPopupOkButton = this.consentPopup.locator('.swal2-confirm');
+    }
+
+    // Anchor on the row div directly holding the checkbox plus its label text (either language) — survives added/reordered checkboxes.
+    private consentCheckbox(kind: ConsentKind): Locator {
+        const key = kind === 'service' ? 'serviceConsent' : 'marketingConsent';
+        const label = new RegExp(`${agreementTexts.TH[key]}|${agreementTexts.EN[key]}`);
+        return this.page
+            .locator('div:has(> input[type="checkbox"])')
+            .filter({ hasText: label })
+            .locator('input[type="checkbox"]');
     }
 
     /** The tappable label text next to a consent checkbox. */

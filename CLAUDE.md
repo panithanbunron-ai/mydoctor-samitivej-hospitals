@@ -74,8 +74,9 @@ expected throughout; cSpell ignores Thai via a regex in `cspell.json`.
 fast, but cases are **not** isolated. A case needing a pristine state calls
 `agreement.goto()` itself (several AGR cases do). Specs use
 `test.describe.configure({ mode: 'default' })` so a failing case doesn't skip the
-rest (unlike `serial`). The `pageErrors` fixture collects genuine page errors
-while filtering environmental WebKit CORS/network noise (`NETWORK_NOISE`); assert
+rest (unlike `serial`). The test-scoped `pageErrors` fixture exposes genuine page
+errors seen during the current case (it drains the worker-level sink first, and
+filters environmental WebKit CORS/network noise via `NETWORK_NOISE`); assert
 `expect(pageErrors).toEqual([])` to catch real runtime errors.
 
 ### `check()` visual assertions
@@ -110,6 +111,6 @@ path assertions) that should stop the test.
   generic Thai copy that hides which field is wrong; `submitExpectingAlert()`
   captures it via a `page.on('dialog')` wait. Blank fields instead show inline
   AngularJS `ng-show` messages ("Please enter Username" / "Password Required").
-- The login **happy path needs a real account**: `LOGIN_001`'s OTP-redirect step and
+- The login **happy path needs a real account**: `LOGIN_001b` (OTP redirect) and
   `LOGIN_003` read `BACKOFFICE_USERNAME`/`BACKOFFICE_PASSWORD` from env and skip when
   unset, so no credentials are committed and CI stays green without secrets.
