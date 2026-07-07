@@ -1,6 +1,7 @@
 import { type Page, type Locator } from '@playwright/test';
 import { registerTexts } from '../../test-data/register';
 import { type LangCode } from '../../test-data/agreement';
+import { ConfirmPage } from './ConfirmPage';
 
 export class RegisterPage {
     /** Path the Agreement page's Confirm button navigates to. */
@@ -36,8 +37,39 @@ export class RegisterPage {
         return this.page.getByText(registerTexts[lang].lastNameLabel).first();
     }
 
+    /** The first-name input, located by its (language-specific) placeholder. */
+    firstNameField(lang: LangCode): Locator {
+        return this.page.getByPlaceholder(registerTexts[lang].firstNamePlaceholder, {
+            exact: true,
+        });
+    }
+
+    /** The last-name input, located by its (language-specific) placeholder. */
+    lastNameField(lang: LangCode): Locator {
+        return this.page.getByPlaceholder(registerTexts[lang].lastNamePlaceholder, { exact: true });
+    }
+
     /** The telephone input, located by its (language-specific) placeholder. */
     phoneField(lang: LangCode): Locator {
         return this.page.getByPlaceholder(registerTexts[lang].phonePlaceholder);
+    }
+
+    /** Fill whichever of the three form fields are provided; omitted fields are left untouched. */
+    async fillForm(
+        lang: LangCode,
+        data: { firstName?: string; lastName?: string; phone?: string },
+    ): Promise<void> {
+        if (data.firstName !== undefined) await this.firstNameField(lang).fill(data.firstName);
+        if (data.lastName !== undefined) await this.lastNameField(lang).fill(data.lastName);
+        if (data.phone !== undefined) await this.phoneField(lang).fill(data.phone);
+    }
+
+    /** From a completely filled form, submit via Next and land on the Confirm page. */
+    async proceedToConfirm(lang: LangCode): Promise<ConfirmPage> {
+        await Promise.all([
+            this.page.waitForURL(`**${ConfirmPage.path}`),
+            this.nextButton(lang).click(),
+        ]);
+        return new ConfirmPage(this.page);
     }
 }

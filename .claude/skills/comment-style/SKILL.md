@@ -12,7 +12,7 @@ down until it does.
 ## Rules
 
 1. **Explain the non-obvious, not the obvious.** Skip comments that restate the
-   code (`// increment i`). Comment the *why* behind a workaround, a quirk of the
+   code (`// increment i`). Comment the _why_ behind a workaround, a quirk of the
    app under test, or a decision that isn't visible from the code.
 
 2. **One line, always.** Every comment — inline or doc-comment — fits on a single

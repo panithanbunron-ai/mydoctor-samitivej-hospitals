@@ -6,6 +6,8 @@ export const registerTexts: Record<
     {
         firstNameLabel: string;
         lastNameLabel: string;
+        firstNamePlaceholder: string;
+        lastNamePlaceholder: string;
         phonePlaceholder: string;
         next: string;
         requiredFieldsError: { title: string; body: string };
@@ -14,6 +16,8 @@ export const registerTexts: Record<
     TH: {
         firstNameLabel: 'ชื่อ *',
         lastNameLabel: 'นามสกุล *',
+        firstNamePlaceholder: 'ชื่อ',
+        lastNamePlaceholder: 'นามสกุล',
         phonePlaceholder: 'กรุณากรอกเบอร์โทรศัพท์',
         next: 'ถัดไป',
         requiredFieldsError: {
@@ -24,12 +28,21 @@ export const registerTexts: Record<
     EN: {
         firstNameLabel: 'First Name *',
         lastNameLabel: 'Last Name *',
+        firstNamePlaceholder: 'First Name',
+        lastNamePlaceholder: 'Last Name',
         phonePlaceholder: 'Please fill your telephone number',
-        next: 'Next',
+        next: 'Continue',
         // EN error copy pending confirmation from the dev team.
         requiredFieldsError: {
             title: 'Error',
             body: 'Please fill in all required fields before proceeding.',
         },
     },
+};
+
+/** A complete, valid register-form submission. */
+export const validRegistration = {
+    firstName: 'Somchai',
+    lastName: 'Jaidee',
+    phone: '0812345678',
 };

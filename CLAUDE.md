@@ -63,7 +63,7 @@ Directory layout:
 The apps ship in Thai and English and the toggle can start in either language.
 Tests read `agreement.currentLanguage()` at runtime and pull the expected copy
 from `test-data` by `LangCode` rather than hard-coding strings — so a test asserts
-the *right* language for whatever state the app loads in. Thai literals are
+the _right_ language for whatever state the app loads in. Thai literals are
 expected throughout; cSpell ignores Thai via a regex in `cspell.json`.
 
 ### Worker-scoped fixtures (telemedicine)
@@ -97,3 +97,8 @@ path assertions) that should stop the test.
   heuristically (tallest scrollable element) rather than via a brittle selector.
 - Consent popups and alerts are **SweetAlert2** (`.swal2-popup`); the consent
   popup is distinguished by the extra `.consent-swal-popup` class.
+- **Register form persists within the session**: revisiting `/register` restores
+  previously entered field values, so on the shared worker page a case that needs
+  blank fields must clear them explicitly (`fillForm(lang, { firstName: '', ... })`).
+- The Register Next button is labelled **"ถัดไป" in TH but "Continue" in EN** (not
+  "Next") — `registerTexts[lang].next` holds the per-language label.
