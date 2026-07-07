@@ -1,6 +1,10 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../../src/pages/backoffice/LoginPage';
-import { loginTexts, backofficeCredentials } from '../../src/test-data/backoffice/login';
+import {
+    loginTexts,
+    loginCases,
+    backofficeCredentials,
+} from '../../src/test-data/backoffice/login';
 import { check } from '../../src/utils/visual-check';
 
 test.describe('Backoffice - Login', () => {
@@ -58,7 +62,7 @@ test.describe('Backoffice - Login', () => {
         const login = new LoginPage(page);
         await login.goto();
 
-        await login.fill({ username: 'notregistered999', password: 'Valid@Pass123' });
+        await login.fill(loginCases.TC_MDR_LOGIN_002);
 
         // UI + wording: a generic native alert appears; it must not reveal which field is wrong.
         const alertMessage = await login.submitExpectingAlert();
@@ -83,7 +87,10 @@ test.describe('Backoffice - Login', () => {
         const login = new LoginPage(page);
         await login.goto();
 
-        await login.fill({ username: backofficeCredentials.username, password: 'WrongPass000' });
+        await login.fill({
+            username: backofficeCredentials.username,
+            password: loginCases.TC_MDR_LOGIN_003.wrongPassword,
+        });
 
         // Wording: identical generic alert as TC_MDR_LOGIN_002 (consistency across both cases).
         const alertMessage = await login.submitExpectingAlert();
@@ -117,7 +124,7 @@ test.describe('Backoffice - Login', () => {
         expect(new URL(page.url()).pathname).toBe(LoginPage.path);
 
         // Filling only one field still blocks submit and shows the other field's message.
-        await login.fill({ username: 'someuser' });
+        await login.fill(loginCases.TC_MDR_LOGIN_004);
         await login.submit();
         await check(
             login.passwordRequiredMessage,

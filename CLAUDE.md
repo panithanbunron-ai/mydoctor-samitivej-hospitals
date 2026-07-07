@@ -56,6 +56,9 @@ Directory layout:
 - `src/test-data/<app>/*.ts` — the app's on-screen strings, keyed by `LangCode`
   (`'TH' | 'EN'`). `telemedicine/agreement.ts` is the source of truth for
   `LangCode`, `ConsentKind`, and the bilingual copy other modules import.
+  Per-case **inputs** live in `*Cases` exports keyed by test-case id
+  (`registerCases.TC_MDR_REG_004`); expected copy stays shared — never move it
+  into a case entry, or the copy drifts between cases.
 - `src/fixtures/telemedicine.ts` — custom `test`/`expect` fixtures (see below).
 - `src/utils/visual-check.ts` — the `check()` visual-assertion helper.
 

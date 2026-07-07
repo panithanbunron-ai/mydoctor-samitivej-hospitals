@@ -10,3 +10,9 @@ export const otpTexts = {
     // Ref.Code format observed on UAT: 6 uppercase alphanumerics.
     refCodePattern: /^[A-Z0-9]{6}$/,
 };
+
+/** Per-case OTP inputs, keyed by test-case id — expected copy stays in otpTexts. */
+export const otpCases = {
+    // Well-formed length but never a valid code.
+    TC_MDR_OTP_009: { invalidOtp: '00000000' },
+} as const;
