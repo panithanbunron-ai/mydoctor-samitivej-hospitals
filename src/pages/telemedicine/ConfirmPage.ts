@@ -1,6 +1,6 @@
 import { type Page, type Locator } from '@playwright/test';
-import { confirmTexts } from '../../test-data/confirm';
-import { type LangCode } from '../../test-data/agreement';
+import { confirmTexts } from '../../test-data/telemedicine/confirm';
+import { type LangCode } from '../../test-data/telemedicine/agreement';
 
 export class ConfirmPage {
     /** Path the Register page's Next button navigates to. */

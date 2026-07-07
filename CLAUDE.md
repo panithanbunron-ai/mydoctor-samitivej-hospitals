@@ -12,9 +12,9 @@ environments (URLs in `.env`):
 - **backoffice** — the staff back-office app (`BACKOFFICE_URL`)
 
 The telemedicine flow is a multi-step wizard: Agreement → Register → Confirm →
-Operation → Call → Review → Success. Only the Agreement step (and its transition
-into Register) is implemented so far; the other page objects and specs exist as
-empty placeholders to be filled in.
+Operation → Call → Review → Success. Agreement, Register, and the Register→Confirm
+transition are implemented; the later steps exist as empty placeholders. On the
+backoffice side, the Login step (through the OTP-page redirect) is implemented.
 
 ## Commands
 
@@ -52,9 +52,9 @@ Directory layout:
   `TC_MDR_<AREA>_NNN : <behavior>`.
 - `src/pages/<app>/*.ts` — **Page Object Models**. A spec never uses raw
   selectors; it goes through a page object's locators and action methods.
-- `src/test-data/*.ts` — the app's on-screen strings, keyed by `LangCode`
-  (`'TH' | 'EN'`). `agreement.ts` is the source of truth for `LangCode`,
-  `ConsentKind`, and the bilingual copy other modules import.
+- `src/test-data/<app>/*.ts` — the app's on-screen strings, keyed by `LangCode`
+  (`'TH' | 'EN'`). `telemedicine/agreement.ts` is the source of truth for
+  `LangCode`, `ConsentKind`, and the bilingual copy other modules import.
 - `src/fixtures/telemedicine.ts` — custom `test`/`expect` fixtures (see below).
 - `src/utils/visual-check.ts` — the `check()` visual-assertion helper.
 
@@ -102,3 +102,13 @@ path assertions) that should stop the test.
   blank fields must clear them explicitly (`fillForm(lang, { firstName: '', ... })`).
 - The Register Next button is labelled **"ถัดไป" in TH but "Continue" in EN** (not
   "Next") — `registerTexts[lang].next` holds the per-language label.
+- **Backoffice login is AngularJS**: the login, OTP, and resend forms coexist in
+  the DOM sharing element ids (`#username`, `#password`), so `LoginPage` scopes
+  every locator to `form[name="myForm"]` / `form[name="otpForm"]:visible`.
+- **Wrong credentials show a native browser `alert()`** (not SweetAlert/toast) with
+  generic Thai copy that hides which field is wrong; `submitExpectingAlert()`
+  captures it via a `page.on('dialog')` wait. Blank fields instead show inline
+  AngularJS `ng-show` messages ("Please enter Username" / "Password Required").
+- The login **happy path needs a real account**: `LOGIN_001`'s OTP-redirect step and
+  `LOGIN_003` read `BACKOFFICE_USERNAME`/`BACKOFFICE_PASSWORD` from env and skip when
+  unset, so no credentials are committed and CI stays green without secrets.

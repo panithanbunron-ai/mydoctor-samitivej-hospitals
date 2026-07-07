@@ -1,6 +1,6 @@
 import { type Page, type Locator } from '@playwright/test';
-import { registerTexts } from '../../test-data/register';
-import { type LangCode } from '../../test-data/agreement';
+import { registerTexts } from '../../test-data/telemedicine/register';
+import { type LangCode } from '../../test-data/telemedicine/agreement';
 import { ConfirmPage } from './ConfirmPage';
 
 export class RegisterPage {

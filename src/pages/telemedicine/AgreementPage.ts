@@ -1,5 +1,5 @@
 import { type Page, type Locator, expect } from '@playwright/test';
-import { agreementTexts, type LangCode, type ConsentKind } from '../../test-data/agreement';
+import { agreementTexts, type LangCode, type ConsentKind } from '../../test-data/telemedicine/agreement';
 import { RegisterPage } from './RegisterPage';
 
 export type { LangCode, ConsentKind };

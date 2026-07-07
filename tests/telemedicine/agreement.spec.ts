@@ -1,7 +1,7 @@
 import { test, expect } from '../../src/fixtures/telemedicine';
 import { type AgreementPage, type LangCode } from '../../src/pages/telemedicine/AgreementPage';
 import { RegisterPage } from '../../src/pages/telemedicine/RegisterPage';
-import { agreementTexts, consentPopups } from '../../src/test-data/agreement';
+import { agreementTexts, consentPopups } from '../../src/test-data/telemedicine/agreement';
 import { check } from '../../src/utils/visual-check';
 
 // 'default' (not 'serial'): cases share the worker's page but each still runs if an earlier one fails.

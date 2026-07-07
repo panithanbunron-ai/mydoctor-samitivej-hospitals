@@ -1,7 +1,7 @@
 import { test, expect } from '../../src/fixtures/telemedicine';
 import { RegisterPage } from '../../src/pages/telemedicine/RegisterPage';
 import { ConfirmPage } from '../../src/pages/telemedicine/ConfirmPage';
-import { registerTexts, validRegistration } from '../../src/test-data/register';
+import { registerTexts, validRegistration } from '../../src/test-data/telemedicine/register';
 import { check } from '../../src/utils/visual-check';
 
 // 'default' (not 'serial'): cases share the worker's page but each still runs if an earlier one fails.
