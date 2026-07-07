@@ -28,7 +28,6 @@ export async function check(
     }
 
     // Strip Playwright's ANSI color codes and keep the first line for the banner/title.
-    // eslint-disable-next-line no-control-regex
     const reason = message
         .replace(/\u001b\[[0-9;]*m/g, '')
         .split('\n')[0]

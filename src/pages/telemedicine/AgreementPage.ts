@@ -1,5 +1,9 @@
 import { type Page, type Locator, expect } from '@playwright/test';
-import { agreementTexts, type LangCode, type ConsentKind } from '../../test-data/telemedicine/agreement';
+import {
+    agreementTexts,
+    type LangCode,
+    type ConsentKind,
+} from '../../test-data/telemedicine/agreement';
 import { RegisterPage } from './RegisterPage';
 
 export type { LangCode, ConsentKind };
@@ -95,6 +99,7 @@ export class AgreementPage {
             el.dispatchEvent(new Event('scroll', { bubbles: true }));
             return true;
         });
+        // eslint-disable-next-line playwright/no-wait-for-timeout -- app needs a beat after the scroll event before checkbox 1 unlocks
         await this.page.waitForTimeout(300);
     }
 

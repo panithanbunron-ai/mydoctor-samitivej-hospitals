@@ -25,7 +25,8 @@ npm run test:backoffice     # backoffice project
 npm run test:ui             # Playwright UI mode
 npm run test:debug          # step-through debugger
 npm run test:report         # open the HTML report from the last run
-npm run lint                # eslint
+npm run lint                # eslint (typescript-eslint + eslint-plugin-playwright)
+npm run typecheck           # tsc --noEmit
 npm run format              # prettier --write (4-space indent, single quotes, width 100)
 
 # Run one spec / one test:
