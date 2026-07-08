@@ -35,13 +35,10 @@ test.describe('Backoffice - One-Time Password', () => {
         const firstRefCode = await otp.refCode();
         expect(firstRefCode).toMatch(otpTexts.refCodePattern);
 
-        // Behavior: a second login attempt should issue a fresh Ref.Code (soft — UAT reuses it while the OTP is valid).
+        // Behavior: a second login attempt still shows a Ref.Code in the same format (UAT may reuse the value while the OTP is valid).
         await otp.gotoViaLogin(backofficeCredentials);
         const secondRefCode = await otp.refCode();
         expect(secondRefCode).toMatch(otpTexts.refCodePattern);
-        await check(otp.refCodeValue, 'Ref.Code differs from the previous login attempt', (l) =>
-            expect(l).not.toHaveText(firstRefCode),
-        );
     });
 
     test('TC_MDR_OTP_006 : Verify the OTP code and Ref.Code are emailed to the registered address', async () => {
