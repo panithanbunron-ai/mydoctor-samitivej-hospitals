@@ -1,7 +1,12 @@
 import { test, expect } from '../../src/fixtures/telemedicine';
 import { RegisterPage } from '../../src/pages/telemedicine/RegisterPage';
 import { ConfirmPage } from '../../src/pages/telemedicine/ConfirmPage';
-import { registerTexts, registerCases } from '../../src/test-data/telemedicine/register';
+import {
+    registerTexts,
+    validRegistration,
+    partialRegistration,
+    mixedPhoneInput,
+} from '../../src/test-data/telemedicine/register';
 import { check } from '../../src/utils/visual-check';
 
 // 'default' (not 'serial'): cases share the worker's page but each still runs if an earlier one fails.
@@ -72,7 +77,7 @@ test.describe('Telemedicine - Register', () => {
         expect(new URL(register.page.url()).pathname).toBe(RegisterPage.path);
 
         // Fill First Name only; clear the rest — the app restores values entered earlier in the session.
-        await register.fillForm(lang, registerCases.TC_MDR_REG_003);
+        await register.fillForm(lang, partialRegistration);
         await register.nextButton(lang).click();
 
         // UI: the same shared error popup as TC_MDR_REG_002 — no per-field inline message.
@@ -113,7 +118,7 @@ test.describe('Telemedicine - Register', () => {
         );
 
         // Fill First Name, Last Name and Phone Number, then tap Next.
-        await register.fillForm(lang, registerCases.TC_MDR_REG_004);
+        await register.fillForm(lang, validRegistration);
         const confirm = await register.proceedToConfirm(lang);
 
         // Behavior: navigation goes to /confirm.
@@ -176,12 +181,11 @@ test.describe('Telemedicine - Register', () => {
         });
 
         // Type a mix of letters, digits and dashes into the Phone Number field.
-        const mixedInput = registerCases.TC_MDR_REG_006.mixedPhone;
-        await register.phoneField(lang).fill(mixedInput);
+        await register.phoneField(lang).fill(mixedPhoneInput);
 
         // UI: the field keeps the typed characters without blocking or stripping input.
         await check(register.phoneField(lang), 'Phone Number keeps non-numeric input', (l) =>
-            expect(l).toHaveValue(mixedInput),
+            expect(l).toHaveValue(mixedPhoneInput),
         );
 
         expect(pageErrors, `page errors: ${pageErrors.join('; ')}`).toEqual([]);

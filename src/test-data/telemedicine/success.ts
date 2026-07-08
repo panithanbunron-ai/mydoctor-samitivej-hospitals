@@ -1,7 +1,12 @@
 import { type LangCode } from './agreement';
 
+type SuccessContent = {
+    message: string;
+    close: string;
+};
+
 /** Success page copy. */
-export const successTexts: Record<LangCode, { message: string; close: string }> = {
+export const successTexts: Record<LangCode, SuccessContent> = {
     TH: {
         message: 'ขอบคุณที่ใช้บริการ My doctor และคำแนะนำของท่าน',
         close: 'ปิด',

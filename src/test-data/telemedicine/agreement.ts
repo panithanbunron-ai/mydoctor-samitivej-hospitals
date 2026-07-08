@@ -3,7 +3,7 @@
 export type LangCode = 'TH' | 'EN';
 export type ConsentKind = 'service' | 'marketing';
 
-type AgreementCopy = {
+type AgreementContent = {
     /** Heading pieces as the DOM splits them (TH renders as two <strong> lines). */
     headingParts: string[];
     serviceConsent: string;
@@ -12,7 +12,7 @@ type AgreementCopy = {
     confirm: string;
 };
 
-export const agreementTexts: Record<LangCode, AgreementCopy> = {
+export const agreementTexts: Record<LangCode, AgreementContent> = {
     TH: {
         headingParts: ['ข้อกำหนดและเงื่อนไขของการรับบริการ', 'และการให้ความยินยอม'],
         serviceConsent: 'ให้ความยินยอมสำหรับการใช้บริการ',
@@ -29,7 +29,7 @@ export const agreementTexts: Record<LangCode, AgreementCopy> = {
     },
 };
 
-type ConsentPopupCopy = {
+type ConsentPopupContent = {
     /** Phrases that must all appear in the popup. */
     contains: string[];
     /** A phrase unique to this consent — proves the two popups aren't swapped. */
@@ -39,7 +39,7 @@ type ConsentPopupCopy = {
 /** OK button label on both consent popups (identical in TH and EN). */
 export const consentPopupOk = 'OK';
 
-export const consentPopups: Record<LangCode, Record<ConsentKind, ConsentPopupCopy>> = {
+export const consentPopups: Record<LangCode, Record<ConsentKind, ConsentPopupContent>> = {
     TH: {
         service: {
             contains: ['เปิดเผยข้อมูลส่วนบุคคลของข้าพเจ้า', 'บริษัท กรุงเทพดรักสโตร์'],

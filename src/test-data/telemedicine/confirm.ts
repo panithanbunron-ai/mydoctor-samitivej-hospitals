@@ -1,13 +1,13 @@
 import { type LangCode } from './agreement';
 
-/** Confirm page copy. Steps are listed in on-screen order. */
-export const confirmTexts: Record<
-    LangCode,
-    {
-        steps: string[];
-        start: string;
-    }
-> = {
+type ConfirmContent = {
+    /** Steps are listed in on-screen order. */
+    steps: string[];
+    start: string;
+};
+
+/** Confirm page copy. */
+export const confirmTexts: Record<LangCode, ConfirmContent> = {
     TH: {
         steps: ['กรุณาเตรียมบัตรประชาชน', 'ซักถามอาการเบื้องต้น (ไม่มีค่าใช้จ่าย)', 'ปรึกษาแพทย์'],
         start: 'เริ่มสนทนา',

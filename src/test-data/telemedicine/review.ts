@@ -1,15 +1,15 @@
 import { type LangCode } from './agreement';
 
-/** Review page copy. Questions are listed in on-screen order. */
-export const reviewTexts: Record<
-    LangCode,
-    {
-        questions: string[];
-        suggestionsLabel: string;
-        suggestionsPlaceholder: string;
-        submit: string;
-    }
-> = {
+type ReviewContent = {
+    /** Questions are listed in on-screen order. */
+    questions: string[];
+    suggestionsLabel: string;
+    suggestionsPlaceholder: string;
+    submit: string;
+};
+
+/** Review page copy. */
+export const reviewTexts: Record<LangCode, ReviewContent> = {
     TH: {
         questions: [
             '1. ความพึงพอใจในการใช้บริการ',

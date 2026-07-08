@@ -1,5 +1,18 @@
+type LoginContent = {
+    usernameLabel: string;
+    passwordLabel: string;
+    loginButton: string;
+    usernameRequired: string;
+    passwordRequired: string;
+    invalidCredentialsAlert: string;
+    otp: {
+        refCode: RegExp;
+        verifyButton: string;
+    };
+};
+
 /** Backoffice login page copy. The app is English-only here; the wrong-credentials alert is Thai. */
-export const loginTexts = {
+export const loginTexts: LoginContent = {
     usernameLabel: 'Username',
     passwordLabel: 'Password',
     // Rendered uppercase ("LOGIN") via CSS; the DOM text is "Login".
@@ -20,12 +33,11 @@ export const backofficeCredentials = {
     password: process.env.BACKOFFICE_PASSWORD ?? '',
 };
 
-/** Per-case login inputs, keyed by test-case id — expected copy stays in loginTexts. */
-export const loginCases = {
-    // Unregistered username paired with a well-formed password.
-    TC_MDR_LOGIN_002: { username: 'notregistered999', password: 'Valid@Pass123' },
-    // Deliberately wrong password to pair with the real BACKOFFICE_USERNAME.
-    TC_MDR_LOGIN_003: { wrongPassword: 'WrongPass000' },
-    // Username-only fill for the one-field-blank check.
-    TC_MDR_LOGIN_004: { username: 'someuser' },
-} as const;
+/** Unregistered username paired with a well-formed password. */
+export const unregisteredCredentials = { username: 'notregistered999', password: 'Valid@Pass123' };
+
+/** Deliberately wrong password to pair with the real BACKOFFICE_USERNAME. */
+export const wrongPassword = 'WrongPass000';
+
+/** Username-only fill for the one-field-blank check. */
+export const usernameOnly = { username: 'someuser' };

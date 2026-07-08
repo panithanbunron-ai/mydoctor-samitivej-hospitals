@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { OneTimePasswordPage } from '../../src/pages/backoffice/oneTimePasswordPage';
-import { otpTexts, otpCases } from '../../src/test-data/backoffice/oneTimePassword';
+import { otpTexts, invalidOtp } from '../../src/test-data/backoffice/oneTimePassword';
 import { backofficeCredentials } from '../../src/test-data/backoffice/login';
 import { check } from '../../src/utils/visual-check';
 
@@ -76,7 +76,7 @@ test.describe('Backoffice - One-Time Password', () => {
         const otp = new OneTimePasswordPage(page);
         await otp.gotoViaLogin(backofficeCredentials);
 
-        await otp.fillOtp(otpCases.TC_MDR_OTP_009.invalidOtp);
+        await otp.fillOtp(invalidOtp);
 
         // Wording: the app rejects via a native alert() — there is no inline field error on UAT.
         const alertMessage = await otp.verifyExpectingAlert();

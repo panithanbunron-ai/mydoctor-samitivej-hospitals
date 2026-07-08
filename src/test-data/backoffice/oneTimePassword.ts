@@ -1,5 +1,14 @@
+type OtpContent = {
+    otpLabel: string;
+    otpPlaceholder: string;
+    refCodeLabel: string;
+    verifyOtpButton: string;
+    invalidOtpAlert: string;
+    refCodePattern: RegExp;
+};
+
 /** Backoffice OTP page copy (English-only, like the login page). */
-export const otpTexts = {
+export const otpTexts: OtpContent = {
     otpLabel: 'OTP Code',
     otpPlaceholder: 'OTP',
     refCodeLabel: 'Ref.Code:',
@@ -11,8 +20,5 @@ export const otpTexts = {
     refCodePattern: /^[A-Z0-9]{6}$/,
 };
 
-/** Per-case OTP inputs, keyed by test-case id — expected copy stays in otpTexts. */
-export const otpCases = {
-    // Well-formed length but never a valid code.
-    TC_MDR_OTP_009: { invalidOtp: '00000000' },
-} as const;
+/** Well-formed length but never a valid code. */
+export const invalidOtp = '00000000';
