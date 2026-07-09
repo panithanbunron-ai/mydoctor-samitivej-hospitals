@@ -117,3 +117,29 @@ path assertions) that should stop the test.
 - The login **happy path needs a real account**: `LOGIN_001b` (OTP redirect) and
   `LOGIN_003` read `BACKOFFICE_USERNAME`/`BACKOFFICE_PASSWORD` from env and skip when
   unset, so no credentials are committed and CI stays green without secrets.
+- **The backoffice emails the OTP** to the account's registered address, from
+  `svh.virtualhospital@bdms.co.th` ("My Doctor Telemedicine System"), subject
+  "Your OTP Verification", body `Dear user <first> <last>, Your OTP Code is :
+  <8-digit OTP> and Ref.Code : <RefCode>`. The **OTP is emailed-only** — the page
+  shows just the Ref.Code, not the OTP. `TC_MDR_OTP_006` reads it back from a
+  **mail.tm throwaway inbox** and correlates it to the login by the on-screen
+  Ref.Code. The mailbox is read from env (`MAILBOX_ADDRESS`/`MAILBOX_PASSWORD`/
+  `MAILBOX_ACCOUNT_NAME`, optional `MAIL_API_URL`/`TEMEMAIL_URL`), so the case
+  skips when unset.
+- **UAT reuses a valid OTP across logins and does not re-send the email** — a
+  second login shows the same on-screen Ref.Code but usually mails nothing. So
+  OTP_006 must NOT empty the inbox before reading (that deletes the one email a
+  reused code will ever have): it matches the on-screen Ref.Code against whatever's
+  already there, and cleanup uses `keepNewest()` (keep the live code's email, drop
+  stale) rather than emptying. The describe runs `mode: 'default'` (sequential,
+  single worker) — the cases share one inbox, so fully-parallel would race.
+- **Reading the email — two layers.** `src/utils/mailClient.ts` (mail.tm REST API,
+  no browser) is the source of truth for the data assertions; match on each
+  message's `intro` from the list, never fetch every message per poll (that hits
+  mail.tm's rate limit). `src/pages/mailtm/MailTmPage.ts` adds the browser-visible
+  proof (report screenshots): mail.tm actively fights automation (a `type=email`
+  honeypot input `#Dont_use_WEB_use_API_OK`; a UI login that drops to a random
+  guest), so `open()` **injects the API session into `localStorage` (`account`/
+  `active`/`accounts`) and reloads** instead of driving the login form. The active
+  account renders as a readonly `input[value="<address>"]`; the email body is
+  sandboxed in an `iframe[id^="iFrameResizer"]` (assert it via `frameLocator`).

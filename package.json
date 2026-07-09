@@ -14,7 +14,9 @@
         "format": "prettier --write .",
         "format:check": "prettier --check .",
         "lint": "eslint .",
-        "typecheck": "tsc --noEmit"
+        "typecheck": "tsc --noEmit",
+        "test:otp": "playwright test ./tests/backoffice/oneTimePassword.spec.ts --project=backoffice --headed",
+        "test:dashboard": "playwright test ./tests/backoffice/dashboard.spec.ts --project=backoffice --headed"
     },
     "repository": {
         "type": "git",

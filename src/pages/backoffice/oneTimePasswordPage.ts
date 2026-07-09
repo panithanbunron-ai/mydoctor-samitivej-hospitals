@@ -46,6 +46,11 @@ export class OneTimePasswordPage {
         await this.otpField.fill(code);
     }
 
+    /** Click Verify OTP for a valid code — the happy path advances to the Reset Password page. */
+    async verify(): Promise<void> {
+        await this.verifyOtpButton.click();
+    }
+
     /** Click Verify OTP and return the message of the native alert() the app shows on a rejected OTP. */
     async verifyExpectingAlert(): Promise<string> {
         const dialog = this.page.waitForEvent('dialog');

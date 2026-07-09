@@ -14,6 +14,8 @@
         "swal",
         "vcheck",
         "domcontentloaded",
-        "openExternalBrowser"
+        "openExternalBrowser",
+        "mailtm",
+        "resizer"
     ]
 }
