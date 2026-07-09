@@ -16,7 +16,8 @@
         "lint": "eslint .",
         "typecheck": "tsc --noEmit",
         "test:otp": "playwright test ./tests/backoffice/oneTimePassword.spec.ts --project=backoffice --headed",
-        "test:dashboard": "playwright test ./tests/backoffice/dashboard.spec.ts --project=backoffice --headed"
+        "test:dashboard": "playwright test ./tests/backoffice/dashboard.spec.ts --project=backoffice --headed",
+        "test:admin": "playwright test ./tests/backoffice/admin.spec.ts --project=backoffice --headed"
     },
     "repository": {
         "type": "git",

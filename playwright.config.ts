@@ -35,6 +35,9 @@ export default defineConfig({
     use: {
         /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
         trace: 'on-first-retry',
+        /* Fail a stuck action/navigation fast instead of letting it eat a long OTP-case test timeout. */
+        actionTimeout: 30_000,
+        navigationTimeout: 30_000,
     },
 
     /* One project per app. Run a single app with: npx playwright test --project=backoffice */

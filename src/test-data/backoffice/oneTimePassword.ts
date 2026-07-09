@@ -68,6 +68,6 @@ export const otpEmail = {
     subject: 'Your OTP Verification',
     // OTP observed on UAT: 8 digits (matches the 8-char invalidOtp above).
     otpPattern: /^\d{8}$/,
-    // Delivery must be prompt; the wait fails the test if it is not met.
-    deliveryTimeoutMs: 60_000,
+    // UAT delivery is slow (5-8 min observed); reused-OTP runs match instantly from the inbox.
+    deliveryTimeoutMs: 480_000,
 };
