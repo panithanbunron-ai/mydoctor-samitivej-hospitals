@@ -57,8 +57,9 @@ export class DashboardPage {
 
     /** A queue tab whose label starts with `label` — the "(n)" count is appended live. */
     // UAT renders the tabs as plain links (Bootstrap nav, no role=tab), some with a space before "(n)".
+    // The count fills in late (slow UAT AJAX), so it's optional here; DASH_001 asserts it separately.
     tab(label: string): Locator {
-        const name = new RegExp(`^${label}\\s*\\(\\d+\\)`);
+        const name = new RegExp(`^${label}\\s*(\\(\\d+\\))?$`);
         return this.page.getByRole('tab', { name }).or(this.page.getByRole('link', { name }));
     }
 

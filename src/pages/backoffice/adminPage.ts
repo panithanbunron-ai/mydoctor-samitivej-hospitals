@@ -42,9 +42,8 @@ export class AdminPage {
         await this.adminMenuItem.click();
         await this.addAdminButton.click();
         await this.saveButton.waitFor({ state: 'visible' });
-        // The form binds Save/validation after an AJAX burst — clicking earlier does nothing;
-        // the สิทธิ์ options arriving is the ready signal.
-        await this.permissionSelect.locator('option').nth(1).waitFor({ state: 'attached' });
+        // The form renders before the bottom script bundles load; Save's onclick needs them.
+        await this.page.waitForLoadState('load');
     }
 
     /** A Create Admin text input, located by its placeholder. */
@@ -71,7 +70,19 @@ export class AdminPage {
         if (data.email !== undefined) await this.field(p.email).fill(data.email);
     }
 
+    // Save first AJAX-checks Email/Username via AdminUserCheck and only submits/validates after
+    // that round trip — so the pre-check firing is the proof the click landed.
     async save(): Promise<void> {
-        await this.saveButton.click();
+        for (let attempt = 0; ; attempt++) {
+            const precheck = this.page
+                .waitForResponse(/AdminUserCheck/, { timeout: 5_000 })
+                .then(() => true)
+                .catch(() => false);
+            await this.saveButton.click();
+            // Late layout shifts (webfont/chosen init) can drop the click on the fieldset instead.
+            if (await precheck) return;
+            if (attempt >= 3)
+                throw new Error('Save click never triggered the AdminUserCheck pre-check.');
+        }
     }
 }

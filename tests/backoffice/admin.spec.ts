@@ -21,8 +21,8 @@ test.describe('Backoffice - Admin', () => {
     // Shared login/mailbox state — run sequentially in a single worker, like the OTP/dashboard cases.
     test.describe.configure({ mode: 'default' });
 
-    // The required-field copy is inferred (see adminTexts) — confirm against live UAT. Needs a
-    // real login + emailed OTP (skips when login/mailbox env is unset). The สิทธิ์/โรงพยาบาล
+    // The required-field copy is confirmed on UAT: a label.validation-error-label under the field.
+    // Needs a real login + emailed OTP (skips when login/mailbox env is unset). The สิทธิ์/โรงพยาบาล
     // dropdowns are not filled yet (selectors/valid values unknown) — add them once known.
     test('TC_MDR_ADM_001 : Verify Admin cannot save a new system administrator when the "ชื่อ" (First name) field is left blank', async ({
         page,
