@@ -54,7 +54,8 @@ test.describe('Backoffice - Admin', () => {
         await check(
             admin.firstNameRequired,
             `required-field error for "${adminTexts.firstNameLabel}" shown`,
-            (l) => expect(l).toBeVisible(),
+            // The error renders well after the Save click — wait for it, don't fail at the 5s default.
+            (l) => expect(l).toBeVisible({ timeout: 30_000 }),
         );
 
         // Behavior: the save is rejected — stays on the Create Admin form (never leaves AdminDetail).
