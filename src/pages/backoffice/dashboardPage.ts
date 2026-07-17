@@ -64,7 +64,12 @@ export class DashboardPage {
     }
 
     async waitFor(): Promise<void> {
-        await this.waitingNurseTab.waitFor({ state: 'visible' });
+        // After OTP redirect the page can take a while to hydrate.
+        // Wait for either the Mute button or a queue tab — whichever appears first.
+        await this.muteButton
+            .or(this.waitingNurseTab)
+            .first()
+            .waitFor({ state: 'visible', timeout: 60_000 });
     }
 
     /** Live count parsed from a tab's "(n)" suffix; -1 if the tab text has no count. */
